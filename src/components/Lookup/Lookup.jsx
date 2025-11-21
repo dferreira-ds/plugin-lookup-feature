@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Manager } from "@twilio/flex-ui";
 import { Flex } from "@twilio-paste/core/flex";
 import {
     Box,
@@ -12,23 +13,31 @@ import {
     Label,
     Input,
     HelpText,
+    Text,
 } from "@twilio-paste/core";
+import { Spinner } from "@twilio-paste/core";
 import { useUID } from "@twilio-paste/core/uid-library";
 import { SearchIcon } from "@twilio-paste/icons/esm/SearchIcon";
 
-const url = process.env.SERVERLESS_LOOKUP_FUNCTION;
+const url = "SERVERLESS_FUNCTION_URL";
 
 const Lookup = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [lineDetails, setLineDetails] = useState([])
     const modalHeadingID = useUID();
 
     const handleSubmit = async () => {
-        const body = JSON.stringify(phoneNumber);
+        setIsLoading(true);
+        const body = {
+            phoneNumber,
+            Token: Manager.getInstance().store.getState().flex.session.ssoTokenPayload.token,
+        };
+
         const options = {
             method: "POST",
-            body,
+            body: JSON.stringify(body),
             headers: {
                 "Content-Type": "application/json"
             }
@@ -40,9 +49,8 @@ const Lookup = () => {
             const data = await response.json();
             setLineDetails(data)
         }
+        setIsLoading(false);
     }
-
-    console.log(lineDetails);
 
     return (
         <Flex hAlignContent="center" vAlignContent="center">
@@ -78,6 +86,18 @@ const Lookup = () => {
                             onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                         <HelpText id="phone_number_num">Number needs to be in E.164 format.</HelpText>
+                        {isLoading ?
+                            <Box marginTop="space60" justifyContent="center" display="flex" alignItems="center">
+                                <Spinner decorative={false} title="Loading" size="sizeIcon80" marginTop="space60"/> 
+                            </Box> : (
+                                lineDetails?.results &&
+                                    <Box marginTop="space60">
+                                        <Text as="p" fontWeight="fontWeightExtrabold" fontSize="fontSize30">Carrier name:</Text><Text as="p" fontSize="fontSize30" color="colorText">{lineDetails?.results?.carrier_name}</Text>
+                                        <Text as="p" fontWeight="fontWeightExtrabold" fontSize="fontSize30">Mobile country code:</Text><Text as="p" fontSize="fontSize30" color="colorText">{lineDetails?.results?.mobile_country_code}</Text>
+                                        <Text as="p" fontWeight="fontWeightExtrabold" fontSize="fontSize30">Mobile network code:</Text><Text as="p" fontSize="fontSize30" color="colorText">{lineDetails?.results?.mobile_network_code}</Text>
+                                        <Text as="p" fontWeight="fontWeightExtrabold" fontSize="fontSize30">Type:</Text><Text as="p" fontSize="fontSize30" color="colorText">{lineDetails?.results?.type}</Text>
+                                    </Box>
+                        )}
                     </Box>
                 </ModalBody>
                 <ModalFooter>
@@ -86,6 +106,7 @@ const Lookup = () => {
                         <Button variant="primary" onClick={handleSubmit}>Search</Button>
                     </ModalFooterActions>
                 </ModalFooter>
+                
             </Modal>
         </Flex>
     )
