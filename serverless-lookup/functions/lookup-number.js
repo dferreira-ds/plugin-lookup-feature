@@ -9,7 +9,7 @@ exports.handler = TokenValidator(async function(context, event, callback) {
   response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
   response.appendHeader("Content-Type", "application/json");
 
-  const phoneNumber = context.phoneNumber;
+  const phoneNumber = event.phoneNumber;
 
   try {
     const lineDetails = await client.lookups.v2
