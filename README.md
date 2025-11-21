@@ -1,8 +1,14 @@
-# Your custom Twilio Flex Plugin
+# Plugin Lookup feature in Flex
 
-Twilio Flex Plugins allow you to customize the appearance and behavior of [Twilio Flex](https://www.twilio.com/flex). If you want to learn more about the capabilities and how to use the API, check out our [Flex documentation](https://www.twilio.com/docs/flex).
+Twilio Flex plugin that allows to use the [Lookup API](https://www.twilio.com/docs/lookup/v2-api). A search icon is added in the MainHeader component, and when you click on it, a Modal will pop up so you can start querying a specific phone number.
+
+## Example
+
+![Demo-2](/docs/demo-2.png "Demo")
 
 ## Setup
+
+In the Lookup component, make sure to update the parameter SERVERLESS_FUNCTION_URL to point to your serverless function.
 
 Make sure you have [Node.js](https://nodejs.org) as well as [`npm`](https://npmjs.com). We support Node >= 10.12 (and recommend the _even_ versions of Node). Afterwards, install the dependencies by running `npm install`:
 
